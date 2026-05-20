@@ -82,7 +82,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // Route to landing or app based on profile
-    const htmlFile = hasProfile() ? "level-up.html" : "landing.html";
+    const htmlFile = hasProfile() ? "index.html" : "landing.html";
     const filePath = path.join(__dirname, htmlFile);
 
     fs.readFile(filePath, (err, data) => {
