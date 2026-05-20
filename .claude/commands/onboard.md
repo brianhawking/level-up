@@ -27,6 +27,6 @@ Then output a JSON block in this exact format — this is critical, the app read
 }
 ```
 
-After outputting the JSON, tell them to save it as `profile.json` in their Level Up project folder, then open `http://localhost:3000` to get started.
+After outputting the JSON, immediately save it as `profile.json` in the current working directory using the Write tool. Do not ask the user to do this — write the file yourself. Then tell them their profile has been saved and to open `http://localhost:3000` to get started.
 
 Start the conversation now with a warm, direct opening. Don't explain what you're doing — just start.
