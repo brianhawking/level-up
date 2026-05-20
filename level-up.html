@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Level Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080c14;
+      --surface: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.08);
+      --accent: #fbbf24;
+      --accent-dim: rgba(251,191,36,0.1);
+      --accent-border: rgba(251,191,36,0.2);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #475569;
+      --text-dimmer: #334155;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Syne', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(251,191,36,0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* Header */
+    .header { margin-bottom: 48px; }
+
+    .header-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .beta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.15em;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-dim);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(255,255,255,0.03);
+      padding: 4px;
+      border-radius: 10px;
+      width: fit-content;
+      margin-bottom: 32px;
+    }
+
+    .tab {
+      padding: 8px 20px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 13px;
+      font-family: var(--mono);
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab.active {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+
+    .tab-badge {
+      background: var(--accent);
+      color: #0f172a;
+      border-radius: 10px;
+      padding: 1px 7px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* Panels */
+    .panel { display: none; flex-direction: column; gap: 24px; }
+    .panel.active { display: flex; }
+
+    /* Normalizer */
+    .normalizer {
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .normalizer-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+
+    .normalizer-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .normalizer input {
+      flex: 1;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--mono);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .normalizer input:focus { border-color: var(--accent-border); }
+
+    .normalizer input::placeholder { color: var(--text-dimmer); }
+
+    .btn-normalize {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #0f172a;
+      font-size: 13px;
+      font-family: var(--display);
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .btn-normalize:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .normalizer-status {
+      font-size: 12px;
+      font-family: var(--mono);
+      min-height: 18px;
+    }
+
+    .normalizer-status.ok { color: #4ade80; }
+    .normalizer-status.err { color: #f87171; }
+
+    /* Search */
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px 12px 44px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--sans);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input:focus { border-color: var(--accent-border); }
+    .search-wrap input::placeholder { color: var(--text-dimmer); }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dimmer);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .search-count {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dimmer);
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+
+    /* Cards container */
+    .cards { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Skill card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(251,191,36,0.25);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .card-name {
+      font-family: var(--display);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .audience-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .audience-tag {
+      font-size: 11px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .tag-mobile  { background: #1a2744; color: #60a5fa; }
+    .tag-ios     { background: #1a2035; color: #818cf8; }
+    .tag-android { background: #1a2a1a; color: #4ade80; }
+    .tag-all     { background: #2a1a2a; color: #e879f9; }
+
+    .btn-trylist {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-trylist.listed {
+      border-color: rgba(251,191,36,0.4);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .setup-vibe {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .setup-vibe span:first-child { font-size: 13px; color: var(--accent); }
+
+    .setup-vibe-text {
+      font-size: 13px;
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    .btn-example {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--text-dimmer);
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      text-align: left;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-example .arrow {
+      display: inline-block;
+      transition: transform 0.2s;
+      font-size: 10px;
+    }
+
+    .btn-example.open .arrow { transform: rotate(90deg); }
+
+    .example-block { display: none; flex-direction: column; gap: 8px; }
+    .example-block.open { display: flex; }
+
+    .example-box {
+      padding: 12px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+    }
+
+    .example-box.input  { border-left: 3px solid #475569; }
+    .example-box.output { border-left: 3px solid var(--accent); }
+
+    .example-label {
+      font-size: 10px;
+      font-family: var(--mono);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .example-box.input  .example-label { color: #475569; }
+    .example-box.output .example-label { color: var(--accent); }
+
+    .example-text {
+      font-size: 13px;
+      font-family: var(--mono);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .example-box.input  .example-text { color: var(--text-muted); }
+    .example-box.output .example-text { color: #cbd5e1; }
+
+    .card-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-tag {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--text-dimmer);
+      letter-spacing: 0.04em;
+    }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 64px;
+      color: var(--text-dimmer);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    /* Try list remove btn */
+    .btn-remove {
+      background: none;
+      border: none;
+      color: var(--text-dimmer);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: var(--mono);
+      padding: 2px 6px;
+      transition: color 0.2s;
+    }
+
+    .btn-remove:hover { color: #f87171; }
+
+    /* Sprint panel */
+    .sprint-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .sprint-title {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .sprint-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.08em;
+    }
+
+    .ticket {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .ticket:hover {
+      border-color: rgba(251,191,36,0.2);
+      transform: translateY(-1px);
+    }
+
+    .ticket-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .ticket-id {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .ticket-title {
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .ticket-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .ticket-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .ticket-pill {
+      font-size: 11px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .pill-type-feature  { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .pill-type-task     { background: rgba(20,184,166,0.12); color: #2dd4bf; }
+    .pill-type-regression { background: rgba(239,68,68,0.12); color: #f87171; }
+    .pill-type-spike    { background: rgba(251,191,36,0.12); color: #fbbf24; }
+    .pill-type-bug      { background: rgba(239,68,68,0.12); color: #f87171; }
+
+    .pill-status-inprogress { background: rgba(251,191,36,0.08); color: #fbbf24; }
+    .pill-status-upnext     { background: rgba(255,255,255,0.05); color: #64748b; }
+    .pill-status-upcoming   { background: rgba(255,255,255,0.03); color: #475569; }
+
+    .pill-epic  { background: rgba(168,85,247,0.12); color: #c084fc; }
+    .pill-team  { background: rgba(255,255,255,0.05); color: #64748b; }
+    .pill-label { background: rgba(255,255,255,0.04); color: #475569; border: 1px solid rgba(255,255,255,0.07); }
+
+    .btn-find-tools {
+      flex-shrink: 0;
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--accent-border);
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-find-tools:hover {
+      background: rgba(251,191,36,0.18);
+    }
+
+    .btn-find-tools:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .ticket-matches {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+
+    .ticket-matches.open { display: flex; }
+
+    .matches-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.1em;
+    }
+
+    .match-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .match-name {
+      font-size: 13px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 500;
+    }
+
+    .match-reason {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-family: var(--sans);
+      margin-top: 2px;
+    }
+
+    .btn-match-try {
+      flex-shrink: 0;
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-match-try.listed {
+      border-color: rgba(251,191,36,0.4);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .matches-loading {
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--text-dimmer);
+      padding: 8px 0;
+    }
+
+    /* Done overlay */
+    .done-overlay {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .done-overlay-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.1em;
+    }
+
+    .done-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-keep {
+      flex: 1;
+      padding: 8px 14px;
+      border-radius: 7px;
+      border: 1px solid rgba(74,222,128,0.3);
+      background: rgba(74,222,128,0.08);
+      color: #4ade80;
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-keep:hover { background: rgba(74,222,128,0.15); }
+
+    .btn-dismiss {
+      flex: 1;
+      padding: 8px 14px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: transparent;
+      color: var(--text-dimmer);
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-dismiss:hover { border-color: rgba(248,113,113,0.3); color: #f87171; }
+
+    .btn-trylist.done {
+      border-color: rgba(74,222,128,0.4);
+      background: rgba(74,222,128,0.08);
+      color: #4ade80;
+    }
+
+    .mytools-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(74,222,128,0.05);
+      border: 1px solid rgba(74,222,128,0.1);
+      border-radius: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #4ade80;
+    }
+
+    /* Stagger animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card { animation: fadeUp 0.3s ease both; }
+    .ticket { animation: fadeUp 0.3s ease both; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <h1>Level Up</h1>
+      <span class="beta">BETA</span>
+    </div>
+    <p class="subtitle">Find the right tool for what you're working on today.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="catalog">Catalog</button>
+    <button class="tab" data-tab="sprint">My Sprint</button>
+    <button class="tab" data-tab="trylist">Try List <span class="tab-badge" id="trylist-badge" style="display:none">0</span></button>
+    <button class="tab" data-tab="mytools">My Tools <span class="tab-badge" id="mytools-badge" style="display:none">0</span></button>
+  </div>
+
+  <!-- Catalog panel -->
+  <div class="panel active" id="panel-catalog">
+
+    <!-- Normalizer -->
+    <div class="normalizer">
+      <div class="normalizer-label">ADD A SKILL HUB</div>
+      <div class="normalizer-row">
+        <input type="text" id="hub-url" placeholder="Paste a hub URL or GitHub repo..." />
+        <button class="btn-normalize" id="btn-normalize">Normalize →</button>
+      </div>
+      <div class="normalizer-status" id="normalizer-status"></div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Search by name, tag, audience..." />
+      <span class="search-count" id="search-count"></span>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards" id="catalog-cards"></div>
+  </div>
+
+  <!-- Sprint panel -->
+  <div class="panel" id="panel-sprint">
+    <div class="sprint-header">
+      <div class="sprint-title">Sprint 42 — Canvas Platform</div>
+      <div class="sprint-meta">MOBILE · iOS TEAM · MAY 5 – MAY 19</div>
+    </div>
+    <div class="cards" id="sprint-cards"></div>
+  </div>
+
+  <!-- Try List panel -->
+  <div class="panel" id="panel-trylist">
+    <div class="cards" id="trylist-cards"></div>
+  </div>
+
+  <!-- My Tools panel -->
+  <div class="panel" id="panel-mytools">
+    <div class="cards" id="mytools-cards"></div>
+  </div>
+
+</div>
+
+<script>
+  // ─── Mock Jira Tickets ────────────────────────────────────────────────────────
+
+  const MOCK_TICKETS = [
+    {
+      id: "IOS-2841",
+      title: "Platform fallback solution for failed feature loads",
+      description: "Implement a client-side fallback mechanism at the platform level so that when a feature fails to load, the customer sees graceful degradation rather than a broken experience. Should be reusable across all canvas features.",
+      type: "feature",
+      status: "inprogress",
+      team: "iOS Platform",
+      epic: "Canvas Resilience",
+      labels: ["platform", "canvas", "ios"],
+      platform: "ios"
+    },
+    {
+      id: "IOS-2798",
+      title: "Canvas — Earn & Activity feature implementation",
+      description: "Continue building out the Earn & Activity section on the canvas screen. Implement the feature tile, handle loading and error states, wire up to the backend data layer.",
+      type: "feature",
+      status: "inprogress",
+      team: "iOS Canvas",
+      epic: "Canvas V2",
+      labels: ["canvas", "earn", "ios"],
+      platform: "ios"
+    },
+    {
+      id: "IOS-2812",
+      title: "Add Earn & Activity strings to localization library",
+      description: "Move hardcoded Earn & Activity strings in the canvas navigation bar into the localized strings library so they are properly localized and reusable across the codebase.",
+      type: "task",
+      status: "upnext",
+      team: "iOS Canvas",
+      epic: "Canvas V2",
+      labels: ["localization", "canvas", "strings"],
+      platform: "ios"
+    },
+    {
+      id: "IOS-2755",
+      title: "Update team runbook and directory for ownership changes",
+      description: "Several feature ownerships have shifted this quarter. Update the team runbook to reflect current on-call ownership and update the team directory accordingly.",
+      type: "task",
+      status: "inprogress",
+      team: "iOS Platform",
+      epic: "Team Operations",
+      labels: ["runbook", "ops", "documentation"],
+      platform: "all"
+    },
+    {
+      id: "IOS-2867",
+      title: "Sprint regression — cycle 1",
+      description: "Execute regression test suite for this sprint's changes. Verify canvas feature loading, fallback behavior, and localization across supported iOS versions.",
+      type: "regression",
+      status: "upcoming",
+      team: "iOS Canvas",
+      epic: "Quality",
+      labels: ["regression", "testing", "canvas"],
+      platform: "ios"
+    }
+  ];
+
+  // ─── State ───────────────────────────────────────────────────────────────────
+
+  const SAMPLE_SKILLS = [
+    {
+      id: "1",
+      name: "Release Notes Generator",
+      description: "Generates formatted release notes from your Jira tickets and commit messages. Handles versioning, categorization, and tone automatically.",
+      example: {
+        input: "JRA-1234: Fixed crash on login screen for iOS 17 users",
+        output: "v2.3.1 — Fixed an issue causing the app to crash on the login screen for some users on iOS 17."
+      },
+      setup_vibe: "Just paste your ticket and run — nothing to configure.",
+      audience: ["mobile", "ios"],
+      source_url: "#",
+      tags: ["documentation", "release", "jira"]
+    },
+    {
+      id: "2",
+      name: "PR Description Writer",
+      description: "Takes your diff or commit list and writes a clear, structured pull request description with context, changes, and testing notes.",
+      example: {
+        input: "Added dark mode toggle, updated theme manager, fixed contrast ratios",
+        output: "## What changed\nAdds a dark mode toggle to settings...\n## Testing\nToggle dark mode on/off and verify contrast."
+      },
+      setup_vibe: "Paste your commits or diff — done in seconds.",
+      audience: ["all"],
+      source_url: "#",
+      tags: ["git", "pr", "documentation"]
+    },
+    {
+      id: "3",
+      name: "Mobile Incident Investigator",
+      description: "Analyzes crash logs and alert payloads to identify likely root causes, affected user segments, and suggested next steps. Mobile-focused.",
+      example: {
+        input: "Crashlytics: NullPointerException in PaymentViewController line 247, 3.2% crash rate",
+        output: "Root cause: nil payment session. Affected: ~12k users on v4.1.x. Suggested: add nil check before session access."
+      },
+      setup_vibe: "Paste your alert payload — works best with Crashlytics or Firebase format.",
+      audience: ["mobile", "ios", "android"],
+      source_url: "#",
+      tags: ["incident", "debugging", "mobile"]
+    },
+    {
+      id: "4",
+      name: "Performance Review Writer",
+      description: "Helps you write self-reviews and peer feedback from your bullet points. Adjusts tone for leadership visibility or peer-level honesty.",
+      example: {
+        input: "Shipped login redesign, mentored two interns, led incident response in Q3",
+        output: "Drove end-to-end delivery of the login redesign impacting 2M+ users. Invested in team growth by mentoring two interns..."
+      },
+      setup_vibe: "Drop in your bullet points and pick your tone — no setup needed.",
+      audience: ["all"],
+      source_url: "#",
+      tags: ["career", "review", "writing"]
+    },
+    {
+      id: "5",
+      name: "Jira Ticket Generator",
+      description: "Turns rough feature ideas or Slack threads into properly structured Jira tickets with acceptance criteria and suggested story points.",
+      example: {
+        input: "We need users to export their transaction history as a CSV",
+        output: "Title: Export transaction history as CSV\nAC: User taps Export, selects date range, receives CSV via email within 60s."
+      },
+      setup_vibe: "Paste your idea or Slack thread — outputs a ready-to-paste ticket.",
+      audience: ["all"],
+      source_url: "#",
+      tags: ["jira", "planning", "tickets"]
+    }
+  ];
+
+  let skills = [...SAMPLE_SKILLS];
+  let tryList = [];
+  let myTools = [];
+  let dismissed = new Set();
+  let searchQuery = "";
+  let ticketMatches = {}; // id -> array of matched skills
+
+  // ─── Render ───────────────────────────────────────────────────────────────────
+
+  function audienceTagHTML(a) {
+    return `<span class="audience-tag tag-${a}">${a}</span>`;
+  }
+
+  // skill state: "none" | "listed" | "done" | "kept"
+  function skillState(id) {
+    if (myTools.some(s => s.id === id)) return "kept";
+    if (tryList.some(s => s.id === id && s._done)) return "done";
+    if (tryList.some(s => s.id === id)) return "listed";
+    return "none";
+  }
+
+  function cardHTML(skill) {
+    const state = skillState(skill.id);
+    const btnLabel = state === "kept" ? "✓ My Tools" : state === "listed" ? "✓ Listed" : "+ Try List";
+    const btnClass = state === "kept" ? "btn-trylist done" : state === "listed" ? "btn-trylist listed" : "btn-trylist";
+
+    return `
+      <div class="card" data-id="${skill.id}" style="animation-delay:${Math.random()*0.1}s">
+        <div class="card-header">
+          <div>
+            <div class="card-name">${skill.name}</div>
+            <div class="audience-tags">${skill.audience.map(audienceTagHTML).join("")}</div>
+          </div>
+          <button class="${btnClass}" data-id="${skill.id}">
+            ${btnLabel}
+          </button>
+        </div>
+        <p class="card-desc">${skill.description}</p>
+        <div class="setup-vibe">
+          <span>⚡</span>
+          <span class="setup-vibe-text">${skill.setup_vibe}</span>
+        </div>
+        <button class="btn-example" data-id="${skill.id}">
+          <span class="arrow">▶</span> SEE EXAMPLE
+        </button>
+        <div class="example-block" id="example-${skill.id}">
+          <div class="example-box input">
+            <div class="example-label">INPUT</div>
+            <div class="example-text">${skill.example.input}</div>
+          </div>
+          <div class="example-box output">
+            <div class="example-label">OUTPUT</div>
+            <div class="example-text">${skill.example.output}</div>
+          </div>
+        </div>
+        <div class="card-tags">${skill.tags.map(t => `<span class="card-tag">#${t}</span>`).join("")}</div>
+        ${state === "done" ? `
+        <div class="done-overlay">
+          <div class="done-overlay-label">YOU TRIED IT — WHAT NOW?</div>
+          <div class="done-actions">
+            <button class="btn-keep" data-id="${skill.id}">✓ Keep it — add to My Tools</button>
+            <button class="btn-dismiss" data-id="${skill.id}">✕ Not for me — dismiss</button>
+          </div>
+        </div>` : ""}
+      </div>
+    `;
+  }
+
+  function renderCatalog() {
+    const q = searchQuery.toLowerCase();
+    const visible = skills.filter(s => !dismissed.has(s.id));
+    const filtered = q
+      ? visible.filter(s =>
+          s.name.toLowerCase().includes(q) ||
+          s.description.toLowerCase().includes(q) ||
+          s.tags.some(t => t.includes(q)) ||
+          s.audience.some(a => a.includes(q))
+        )
+      : visible;
+
+    const container = document.getElementById("catalog-cards");
+    const countEl = document.getElementById("search-count");
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="empty">No skills match that search.</div>`;
+    } else {
+      container.innerHTML = filtered.map(s => cardHTML(s)).join("");
+    }
+
+    countEl.textContent = q ? `${filtered.length} result${filtered.length !== 1 ? "s" : ""}` : "";
+  }
+
+  function renderTryList() {
+    const container = document.getElementById("trylist-cards");
+    const badge = document.getElementById("trylist-badge");
+
+    badge.textContent = tryList.length;
+    badge.style.display = tryList.length > 0 ? "inline" : "none";
+
+    if (tryList.length === 0) {
+      container.innerHTML = `<div class="empty">Nothing queued yet. Add skills from the catalog.</div>`;
+    } else {
+      container.innerHTML = tryList.map(s => cardHTML(s)).join("");
+    }
+  }
+
+  function renderMyTools() {
+    const container = document.getElementById("mytools-cards");
+    const badge = document.getElementById("mytools-badge");
+
+    badge.textContent = myTools.length;
+    badge.style.display = myTools.length > 0 ? "inline" : "none";
+
+    if (myTools.length === 0) {
+      container.innerHTML = `<div class="empty">Nothing here yet. Try a skill from your list and keep it.</div>`;
+    } else {
+      container.innerHTML = myTools.map(s => cardHTML(s)).join("");
+    }
+  }
+
+  function statusLabel(s) {
+    const map = { inprogress: "In Progress", upnext: "Up Next", upcoming: "Upcoming" };
+    return map[s] || s;
+  }
+
+  function ticketHTML(ticket) {
+    const matches = ticketMatches[ticket.id];
+    const hasMatches = matches && matches.length > 0;
+    const isLoading = matches === "loading";
+
+    return `
+      <div class="ticket" data-ticket-id="${ticket.id}">
+        <div class="ticket-top">
+          <div>
+            <div class="ticket-id">${ticket.id}</div>
+            <div class="ticket-title">${ticket.title}</div>
+          </div>
+          <button class="btn-find-tools" data-ticket-id="${ticket.id}" ${isLoading ? "disabled" : ""}>
+            ${isLoading ? "Searching..." : hasMatches ? "↻ Refresh" : "Find Tools →"}
+          </button>
+        </div>
+        <p class="ticket-desc">${ticket.description}</p>
+        <div class="ticket-meta">
+          <span class="ticket-pill pill-type-${ticket.type}">${ticket.type}</span>
+          <span class="ticket-pill pill-status-${ticket.status}">${statusLabel(ticket.status)}</span>
+          <span class="ticket-pill pill-epic">${ticket.epic}</span>
+          <span class="ticket-pill pill-team">${ticket.team}</span>
+          ${ticket.labels.map(l => `<span class="ticket-pill pill-label">#${l}</span>`).join("")}
+        </div>
+        <div class="ticket-matches ${hasMatches ? "open" : ""}" id="matches-${ticket.id}">
+          ${isLoading
+            ? `<div class="matches-loading">Finding relevant tools...</div>`
+            : hasMatches
+              ? `<div class="matches-label">SUGGESTED TOOLS</div>
+                 ${matches.map(m => `
+                   <div class="match-row">
+                     <div>
+                       <div class="match-name">${m.name}</div>
+                       <div class="match-reason">${m.reason}</div>
+                     </div>
+                     <button class="btn-match-try ${tryList.some(t => t.id === m.id) ? "listed" : ""}" data-id="${m.id}">
+                       ${tryList.some(t => t.id === m.id) ? "✓ Listed" : "+ Try List"}
+                     </button>
+                   </div>
+                 `).join("")}`
+              : ""
+          }
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSprint() {
+    const container = document.getElementById("sprint-cards");
+    container.innerHTML = MOCK_TICKETS.map(ticketHTML).join("");
+  }
+
+  // Find tools for a ticket using Claude
+  async function findToolsForTicket(ticket) {
+    console.log("findToolsForTicket called for", ticket.id);
+    ticketMatches[ticket.id] = "loading";
+    renderSprint();
+    console.log("Sprint re-rendered with loading state");
+
+    try {
+      const prompt = `You are a developer tool recommender for an internal tool called Level Up.
+
+A developer has this Jira ticket:
+ID: ${ticket.id}
+Title: ${ticket.title}
+Description: ${ticket.description}
+Type: ${ticket.type}
+Epic: ${ticket.epic}
+Team: ${ticket.team}
+Labels: ${ticket.labels.join(", ")}
+
+Here are the available skills in the catalog:
+${skills.map(s => `- ID: ${s.id} | Name: ${s.name} | Description: ${s.description} | Tags: ${s.tags.join(", ")} | Audience: ${s.audience.join(", ")}`).join("\n")}
+
+Return the 1-3 most relevant skills for this ticket. For each match explain in one short sentence why it's relevant to this specific ticket.
+
+Respond ONLY with a valid JSON array like:
+[{ "id": "skill-id", "name": "Skill Name", "reason": "One sentence why this helps." }]
+
+No markdown, no backticks, no explanation outside the JSON.`;
+
+      const response = await fetch("http://localhost:3000", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await response.json();
+      const clean = (data.text || "").replace(/```json|```/g, "").trim();
+      const matches = JSON.parse(clean);
+      ticketMatches[ticket.id] = matches;
+
+    } catch(err) {
+      console.error("findToolsForTicket error:", err);
+      ticketMatches[ticket.id] = [];
+    }
+
+    console.log("renderSprint after match, matches:", ticketMatches[ticket.id]);
+    renderSprint();
+  }
+
+  
+
+  // ─── Events ───────────────────────────────────────────────────────────────────
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(`panel-${btn.dataset.tab}`).classList.add("active");
+    });
+  });
+
+  // Search
+  document.getElementById("search").addEventListener("input", e => {
+    searchQuery = e.target.value;
+    renderCatalog();
+  });
+
+  // Card interactions — delegated
+  document.addEventListener("click", e => {
+    // Try list toggle — three states: none -> listed -> done (overlay) -> keep/dismiss
+    const tryBtn = e.target.closest(".btn-trylist");
+    if (tryBtn) {
+      const id = tryBtn.dataset.id;
+      const skill = skills.find(s => s.id === id) || tryList.find(s => s.id === id);
+      if (!skill) return;
+      const state = skillState(id);
+
+      if (state === "none") {
+        tryList.push({ ...skill });
+      } else if (state === "listed") {
+        // Mark as done — set _done flag so overlay shows
+        tryList = tryList.map(s => s.id === id ? { ...s, _done: true } : s);
+      } else if (state === "kept") {
+        return; // already in my tools, do nothing
+      }
+
+      renderCatalog();
+      renderTryList();
+      renderMyTools();
+      return;
+    }
+
+    // Example toggle
+    const exBtn = e.target.closest(".btn-example");
+    if (exBtn) {
+      const id = exBtn.dataset.id;
+      const block = document.getElementById(`example-${id}`);
+      const isOpen = block.classList.toggle("open");
+      exBtn.classList.toggle("open", isOpen);
+      exBtn.querySelector(".arrow").parentElement.innerHTML =
+        `<span class="arrow">▶</span> ${isOpen ? "HIDE EXAMPLE" : "SEE EXAMPLE"}`;
+      // re-apply open class since we replaced innerHTML
+      if (isOpen) exBtn.classList.add("open");
+      return;
+    }
+
+    // Find tools for ticket
+    const findBtn = e.target.closest(".btn-find-tools");
+    if (findBtn) {
+      console.log("Find tools clicked, ticketId:", findBtn.dataset.ticketId);
+      const ticketId = findBtn.dataset.ticketId;
+      const ticket = MOCK_TICKETS.find(t => t.id === ticketId);
+      console.log("Ticket found:", ticket);
+      if (ticket) findToolsForTicket(ticket);
+      return;
+    }
+
+    // Keep — move to My Tools
+    const keepBtn = e.target.closest(".btn-keep");
+    if (keepBtn) {
+      const id = keepBtn.dataset.id;
+      const skill = skills.find(s => s.id === id) || tryList.find(s => s.id === id);
+      if (!skill) return;
+      tryList = tryList.filter(s => s.id !== id);
+      if (!myTools.some(s => s.id === id)) myTools.push({ ...skill, _done: false });
+      renderCatalog();
+      renderTryList();
+      renderMyTools();
+      return;
+    }
+
+    // Dismiss — remove everywhere
+    const dismissBtn = e.target.closest(".btn-dismiss");
+    if (dismissBtn) {
+      const id = dismissBtn.dataset.id;
+      tryList = tryList.filter(s => s.id !== id);
+      dismissed.add(id);
+      renderCatalog();
+      renderTryList();
+      renderMyTools();
+      return;
+    }
+
+    // Try list from match row
+    const matchTryBtn = e.target.closest(".btn-match-try");
+    if (matchTryBtn) {
+      const id = matchTryBtn.dataset.id;
+      const skill = skills.find(s => s.id === id);
+      if (!skill) return;
+      const idx = tryList.findIndex(s => s.id === id);
+      if (idx >= 0) tryList.splice(idx, 1);
+      else tryList.push(skill);
+      renderTryList();
+      renderSprint();
+      return;
+    }
+  });
+
+  // Normalizer
+  const hubInput = document.getElementById("hub-url");
+  const normalizeBtn = document.getElementById("btn-normalize");
+  const statusEl = document.getElementById("normalizer-status");
+
+  async function normalize() {
+    const url = hubInput.value.trim();
+    if (!url) return;
+
+    normalizeBtn.disabled = true;
+    normalizeBtn.textContent = "Reading...";
+    statusEl.textContent = "Fetching hub content...";
+    statusEl.className = "normalizer-status";
+
+    try {
+      const prompt = `You are a skill catalog normalizer for an internal developer tool called Level Up.
+
+A developer has shared content from this URL: ${url}
+
+Your job is to EXTRACT skill cards from the actual content provided — do not invent or guess. Only create a card if the content clearly describes a real skill, prompt, tool, or use case.
+
+For each skill you find, extract it into this exact JSON schema:
+
+{
+  "id": "unique string",
+  "name": "Skill Name — use the actual name from the content",
+  "description": "One to two plain sentences describing what it actually does. No hype. Based only on what the content says.",
+  "example": { "input": "realistic example input based on the content", "output": "realistic example output based on the content" },
+  "setup_vibe": "One honest sentence about setup effort based on what the content describes",
+  "audience": ["mobile" or "ios" or "android" or "all" — infer from context],
+  "source_url": "${url}",
+  "tags": ["tag1", "tag2" — infer from the actual content]
+}
+
+Extract every skill you can find, up to 20. If the content has fewer than 20 distinct skills, return only what is actually there.
+If you cannot find any real skills in the content, return an empty array [].
+
+Respond ONLY with a valid JSON array. No markdown, no backticks, no explanation.`;
+
+      const response = await fetch("http://localhost:3000", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, url })
+      });
+
+      const data = await response.json();
+      const clean = (data.text || "").replace(/```json|```/g, "").trim();
+      const newSkills = JSON.parse(clean);
+
+      newSkills.forEach((s, i) => { s.id = `imported-${Date.now()}-${i}`; });
+      skills = [...skills, ...newSkills];
+
+      statusEl.textContent = `✓ Added ${newSkills.length} skill${newSkills.length !== 1 ? "s" : ""} to catalog.`;
+      statusEl.className = "normalizer-status ok";
+      hubInput.value = "";
+      renderCatalog();
+      renderTryList();
+      renderSprint();
+
+    } catch (err) {
+      statusEl.textContent = `Error: ${err.message}`;
+      statusEl.className = "normalizer-status err";
+      console.error("Normalizer error:", err);
+    } finally {
+      normalizeBtn.disabled = false;
+      normalizeBtn.textContent = "Normalize →";
+    }
+  }
+
+  normalizeBtn.addEventListener("click", normalize);
+  hubInput.addEventListener("keydown", e => { if (e.key === "Enter") normalize(); });
+
+  // ─── Init ─────────────────────────────────────────────────────────────────────
+  renderCatalog();
+  renderTryList();
+  renderMyTools();
+  renderSprint();
+</script>
+</body>
+</html>
