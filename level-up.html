@@ -698,6 +698,169 @@
       color: #4ade80;
     }
 
+    /* XP / Level bar */
+    .xp-bar-wrap {
+      margin-bottom: 32px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .xp-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .xp-level-title {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .xp-counter {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.06em;
+    }
+
+    .xp-track {
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      border-radius: 99px;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .xp-next {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.05em;
+    }
+
+    /* Direct add to My Tools */
+    .direct-add {
+      background: rgba(74,222,128,0.04);
+      border: 1px solid rgba(74,222,128,0.12);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .direct-add-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #4ade80;
+      letter-spacing: 0.1em;
+    }
+
+    .direct-add-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .direct-add input {
+      flex: 1;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--mono);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .direct-add input:focus { border-color: rgba(74,222,128,0.3); }
+    .direct-add input::placeholder { color: var(--text-dimmer); }
+
+    .btn-direct-add {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: #4ade80;
+      color: #0f172a;
+      font-size: 13px;
+      font-family: var(--display);
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .btn-direct-add:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .direct-add-status {
+      font-size: 12px;
+      font-family: var(--mono);
+      min-height: 18px;
+    }
+
+    .direct-add-status.ok  { color: #4ade80; }
+    .direct-add-status.err { color: #f87171; }
+
+    /* Use again button on My Tools cards */
+    .btn-use-again {
+      align-self: flex-start;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(251,191,36,0.2);
+      background: rgba(251,191,36,0.06);
+      color: var(--accent);
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-use-again:hover { background: rgba(251,191,36,0.14); }
+
+    /* XP toast */
+    .xp-toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: rgba(251,191,36,0.12);
+      border: 1px solid rgba(251,191,36,0.3);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+
+    .xp-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     /* Stagger animation */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -719,6 +882,19 @@
     </div>
     <p class="subtitle">Find the right tool for what you're working on today.</p>
   </div>
+
+  <!-- XP Bar -->
+  <div class="xp-bar-wrap" id="xp-bar">
+    <div class="xp-top">
+      <div class="xp-level-title" id="xp-level-title">Level 1 — Curious</div>
+      <div class="xp-counter" id="xp-counter">0 XP</div>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <div class="xp-next" id="xp-next">50 XP to Level 2 — Explorer</div>
+  </div>
+
+  <!-- XP Toast -->
+  <div class="xp-toast" id="xp-toast"></div>
 
   <!-- Tabs -->
   <div class="tabs">
@@ -768,6 +944,14 @@
 
   <!-- My Tools panel -->
   <div class="panel" id="panel-mytools">
+    <div class="direct-add">
+      <div class="direct-add-label">ADD A TOOL DIRECTLY</div>
+      <div class="direct-add-row">
+        <input type="text" id="direct-url" placeholder="Paste a repo or skill URL you already use..." />
+        <button class="btn-direct-add" id="btn-direct-add">Add to My Tools →</button>
+      </div>
+      <div class="direct-add-status" id="direct-add-status"></div>
+    </div>
     <div class="cards" id="mytools-cards"></div>
   </div>
 
@@ -911,6 +1095,70 @@
   let searchQuery = "";
   let ticketMatches = {}; // id -> array of matched skills
 
+  // ─── XP / Level System ──────────────────────────────────────────────────────
+
+  const LEVELS = [
+    { level: 1, title: "Curious",      xpRequired: 0   },
+    { level: 2, title: "Explorer",     xpRequired: 50  },
+    { level: 3, title: "Adopter",      xpRequired: 150 },
+    { level: 4, title: "Practitioner", xpRequired: 350 },
+    { level: 5, title: "Multiplier",   xpRequired: 700 },
+  ];
+
+  const XP_VALUES = {
+    addToTryList:  10,
+    markDone:      25,
+    keepTool:      40,
+    dismissTool:   10,
+    useAgain:      15,
+    directAdd:     50,
+  };
+
+  let totalXP = 0;
+
+  function getCurrentLevel() {
+    let current = LEVELS[0];
+    for (const l of LEVELS) {
+      if (totalXP >= l.xpRequired) current = l;
+    }
+    return current;
+  }
+
+  function getNextLevel() {
+    const cur = getCurrentLevel();
+    return LEVELS.find(l => l.level === cur.level + 1) || null;
+  }
+
+  function awardXP(amount, reason) {
+    totalXP += amount;
+    updateXPBar();
+    showXPToast(`+${amount} XP — ${reason}`);
+  }
+
+  function updateXPBar() {
+    const cur = getCurrentLevel();
+    const next = getNextLevel();
+    const xpInLevel = totalXP - cur.xpRequired;
+    const xpNeeded = next ? next.xpRequired - cur.xpRequired : 1;
+    const pct = next ? Math.min(100, (xpInLevel / xpNeeded) * 100) : 100;
+
+    document.getElementById("xp-level-title").textContent = `Level ${cur.level} — ${cur.title}`;
+    document.getElementById("xp-counter").textContent = `${totalXP} XP`;
+    document.getElementById("xp-fill").style.width = `${pct}%`;
+    document.getElementById("xp-next").textContent = next
+      ? `${next.xpRequired - totalXP} XP to Level ${next.level} — ${next.title}`
+      : "Max level reached — you're a Multiplier 🏆";
+  }
+
+  let toastTimer = null;
+  function showXPToast(msg) {
+    const toast = document.getElementById("xp-toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+  }
+
   // ─── Render ───────────────────────────────────────────────────────────────────
 
   function audienceTagHTML(a) {
@@ -960,6 +1208,8 @@
           </div>
         </div>
         <div class="card-tags">${skill.tags.map(t => `<span class="card-tag">#${t}</span>`).join("")}</div>
+        ${state === "kept" ? `
+        <button class="btn-use-again" data-id="${skill.id}">⚡ Used it today</button>` : ""}
         ${state === "done" ? `
         <div class="done-overlay">
           <div class="done-overlay-label">YOU TRIED IT — WHAT NOW?</div>
@@ -1162,11 +1412,12 @@ No markdown, no backticks, no explanation outside the JSON.`;
 
       if (state === "none") {
         tryList.push({ ...skill });
+        awardXP(XP_VALUES.addToTryList, "added to Try List");
       } else if (state === "listed") {
-        // Mark as done — set _done flag so overlay shows
         tryList = tryList.map(s => s.id === id ? { ...s, _done: true } : s);
+        awardXP(XP_VALUES.markDone, "tried a tool");
       } else if (state === "kept") {
-        return; // already in my tools, do nothing
+        return;
       }
 
       renderCatalog();
@@ -1207,10 +1458,20 @@ No markdown, no backticks, no explanation outside the JSON.`;
       const skill = skills.find(s => s.id === id) || tryList.find(s => s.id === id);
       if (!skill) return;
       tryList = tryList.filter(s => s.id !== id);
-      if (!myTools.some(s => s.id === id)) myTools.push({ ...skill, _done: false });
+      if (!myTools.some(s => s.id === id)) {
+        myTools.push({ ...skill, _done: false });
+        awardXP(XP_VALUES.keepTool, "kept a tool");
+      }
       renderCatalog();
       renderTryList();
       renderMyTools();
+      return;
+    }
+
+    // Use again — award XP for continued use
+    const useAgainBtn = e.target.closest(".btn-use-again");
+    if (useAgainBtn) {
+      awardXP(XP_VALUES.useAgain, "used a tool again");
       return;
     }
 
@@ -1220,6 +1481,7 @@ No markdown, no backticks, no explanation outside the JSON.`;
       const id = dismissBtn.dataset.id;
       tryList = tryList.filter(s => s.id !== id);
       dismissed.add(id);
+      awardXP(XP_VALUES.dismissTool, "learned what doesn't fit");
       renderCatalog();
       renderTryList();
       renderMyTools();
@@ -1313,7 +1575,76 @@ Respond ONLY with a valid JSON array. No markdown, no backticks, no explanation.
   normalizeBtn.addEventListener("click", normalize);
   hubInput.addEventListener("keydown", e => { if (e.key === "Enter") normalize(); });
 
+  // ─── Direct Add to My Tools ──────────────────────────────────────────────────
+  const directInput = document.getElementById("direct-url");
+  const directBtn = document.getElementById("btn-direct-add");
+  const directStatus = document.getElementById("direct-add-status");
+
+  async function directAdd() {
+    const url = directInput.value.trim();
+    if (!url) return;
+
+    directBtn.disabled = true;
+    directBtn.textContent = "Reading...";
+    directStatus.textContent = "Fetching tool info...";
+    directStatus.className = "direct-add-status";
+
+    try {
+      const prompt = `You are a skill card extractor for a developer tool called Level Up.
+
+A developer wants to add this tool directly to their personal toolkit: ${url}
+
+Read the content provided and extract ONE skill card representing this tool.
+
+Use this exact JSON schema:
+{
+  "id": "unique string",
+  "name": "Tool name from the content",
+  "description": "One to two plain sentences describing what it actually does.",
+  "example": { "input": "realistic example input", "output": "realistic example output" },
+  "setup_vibe": "One honest sentence about setup effort",
+  "audience": ["mobile" or "ios" or "android" or "all"],
+  "source_url": "${url}",
+  "tags": ["tag1", "tag2"]
+}
+
+Respond ONLY with a single valid JSON object. No array, no markdown, no backticks.`;
+
+      const response = await fetch("http://localhost:3000", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, url })
+      });
+
+      const data = await response.json();
+      const clean = (data.text || "").replace(/```json|```/g, "").trim();
+      const skill = JSON.parse(clean);
+      skill.id = `direct-${Date.now()}`;
+
+      if (!myTools.some(s => s.name === skill.name)) {
+        myTools.push(skill);
+        awardXP(XP_VALUES.directAdd, "added a tool directly");
+      }
+
+      directStatus.textContent = `✓ Added "${skill.name}" to My Tools.`;
+      directStatus.className = "direct-add-status ok";
+      directInput.value = "";
+      renderMyTools();
+
+    } catch(err) {
+      directStatus.textContent = `Error: ${err.message}`;
+      directStatus.className = "direct-add-status err";
+    } finally {
+      directBtn.disabled = false;
+      directBtn.textContent = "Add to My Tools →";
+    }
+  }
+
+  directBtn.addEventListener("click", directAdd);
+  directInput.addEventListener("keydown", e => { if (e.key === "Enter") directAdd(); });
+
   // ─── Init ─────────────────────────────────────────────────────────────────────
+  updateXPBar();
   renderCatalog();
   renderTryList();
   renderMyTools();
