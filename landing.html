@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Level Up — Get Started</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080c14;
+      --accent: #fbbf24;
+      --accent-dim: rgba(251,191,36,0.08);
+      --accent-border: rgba(251,191,36,0.2);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #475569;
+      --text-dimmer: #334155;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Syne', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Ambient glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(251,191,36,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .landing {
+      position: relative;
+      max-width: 560px;
+      width: 100%;
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .tagline strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      font-family: var(--sans);
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .command-block {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-top: 4px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .command-block:hover { border-color: var(--accent-border); }
+
+    .command-text {
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+
+    .copy-hint {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.08em;
+    }
+
+    .copied {
+      color: #4ade80 !important;
+    }
+
+    .footer {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dimmer);
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+<div class="landing">
+
+  <div class="logo">
+    <h1>Level Up</h1>
+  </div>
+
+  <p class="tagline">
+    Your personal guide to the AI tools your company has built.<br />
+    <strong>Find tools that fit your actual work. Build your toolkit over time.</strong>
+  </p>
+
+  <div class="divider"></div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Open Claude Code in your terminal</div>
+        <div class="step-desc">Make sure you're in your Level Up project folder.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Run the onboarding command</div>
+        <div class="step-desc">Claude will ask you a few questions to build your profile. Takes about 2 minutes.</div>
+        <div class="command-block" id="copy-btn">
+          <span class="command-text">/onboard</span>
+          <span class="copy-hint" id="copy-hint">CLICK TO COPY</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Save your profile and come back</div>
+        <div class="step-desc">Claude will give you a <code style="font-family:var(--mono);color:var(--accent);font-size:12px">profile.json</code> to save in this folder. Once it's there, refresh this page and you're in.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="footer">LEVEL UP · INTERNAL DEVELOPER TOOLS</div>
+
+</div>
+
+<script>
+  document.getElementById("copy-btn").addEventListener("click", () => {
+    navigator.clipboard.writeText("/onboard").then(() => {
+      const hint = document.getElementById("copy-hint");
+      hint.textContent = "COPIED!";
+      hint.classList.add("copied");
+      setTimeout(() => {
+        hint.textContent = "CLICK TO COPY";
+        hint.classList.remove("copied");
+      }, 2000);
+    });
+  });
+</script>
+</body>
+</html>
